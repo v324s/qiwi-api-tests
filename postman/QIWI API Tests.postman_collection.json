@@ -1,0 +1,263 @@
+{
+	"info": {
+		"_postman_id": "cacf0715-ce24-4eae-af1d-861f9e745ce4",
+		"name": "QIWI API Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37307404"
+	},
+	"item": [
+		{
+			"name": "Access",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{payout.api.url}}/v1/agents/{{agentId}}/points/{{pointId}}/payments",
+					"host": [
+						"{{payout.api.url}}"
+					],
+					"path": [
+						"v1",
+						"agents",
+						"{{agentId}}",
+						"points",
+						"{{pointId}}",
+						"payments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Баланс > 0\", function() {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"    pm.response.json();\r",
+							"    const balance = pm.response.json().balance;\r",
+							"    pm.expect(balance).to.be.above(0);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{payout.api.url}}/v1/agents/{{agentId}}/points/{{pointId}}/balance",
+					"host": [
+						"{{payout.api.url}}"
+					],
+					"path": [
+						"v1",
+						"agents",
+						"{{agentId}}",
+						"points",
+						"{{pointId}}",
+						"balance"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New payment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Платеж создан\", function() {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an('object').and.to.not.be.null;\r",
+							"    jsonData.paymentId ? pm.environment.set(\"paymentId\", jsonData.paymentId) : pm.expect.fail(\"ID платежа в ответе не найден\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Сумма платежа 1 рубль\", function() {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property(\"amount\");\r",
+							"    pm.expect(jsonData.amount).to.have.property(\"value\");\r",
+							"    pm.expect(jsonData.amount.value).to.equal(1);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"recipientDetails\":{\"providerCode\":\"bank-card-russia\",\"fields\":{\"pan\":\"1234564543654321\"}},\"amount\":{\"value\":\"1.00\",\"currency\":\"RUB\"}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{payout.api.url}}/v1/agents/{{agentId}}/points/{{pointId}}/payments/{{$guid}}",
+					"host": [
+						"{{payout.api.url}}"
+					],
+					"path": [
+						"v1",
+						"agents",
+						"{{agentId}}",
+						"points",
+						"{{pointId}}",
+						"payments",
+						"{{$guid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Execute payment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Платеж исполнен\", function() {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an('object').and.to.not.be.null;\r",
+							"    jsonData.paymentId ? pm.environment.set(\"paymentId\", jsonData.paymentId) : pm.expect.fail(\"ID платежа в ответе не найден\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{payout.api.url}}/v1/agents/{{agentId}}/points/{{pointId}}/payments/{{paymentId}}/execute",
+					"host": [
+						"{{payout.api.url}}"
+					],
+					"path": [
+						"v1",
+						"agents",
+						"{{agentId}}",
+						"points",
+						"{{pointId}}",
+						"payments",
+						"{{paymentId}}",
+						"execute"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"pm.test(\"Запрос выполнен успешно (Status code: 200)\", function(){\r",
+					"    pm.response.to.have.status(200);\r",
+					"});\r",
+					"\r",
+					"pm.test(\"Ошибка данных/прав доступа/токена (Status code: 4ХХ)\", function(){\r",
+					"    pm.expect(pm.response.code).to.be.at.least(400).and.at.most(499);\r",
+					"});\r",
+					"\r",
+					"pm.test(\"Серверная ошибка (Status code: 5ХХ)\", function(){\r",
+					"    // pm.response.to.have.status(200);\r",
+					"    pm.expect(pm.response.code).to.be.oneOf([500, 501, 502, 503, 504, 505]);\r",
+					"});\r",
+					"\r",
+					"pm.test(\"Получен ожидаемый формат ответа\", function() {\r",
+					"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+					"    const jsonData = pm.response.json();\r",
+					"    pm.expect(jsonData).to.be.an('object');\r",
+					"});\r",
+					"\r",
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "payout.api.url",
+			"value": "https://api-test.qiwi.com/partner/payout/"
+		},
+		{
+			"key": "token",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
+		},
+		{
+			"key": "walletId",
+			"value": "7500c92d-f24d-4c5f-b870-4c52d9e6978c"
+		},
+		{
+			"key": "agentId",
+			"value": "acme"
+		},
+		{
+			"key": "pointId",
+			"value": "00001"
+		}
+	]
+}
