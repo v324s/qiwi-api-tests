@@ -1,11 +1,11 @@
 const { test, expect } = require('@playwright/test');
 
 const config = {
-  baseUrl: 'https://api-test.qiwi.com/partner/payout/',
-  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30',
-  agentId: 'acme',
-  pointId: '00001',
-  walletId: '7500c92d-f24d-4c5f-b870-4c52d9e6978c'
+    baseUrl: 'https://api-test.qiwi.com/partner/payout/',
+    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30',
+    agentId: 'acme',
+    pointId: '00001',
+    walletId: '7500c92d-f24d-4c5f-b870-4c52d9e6978c'
 };
 
 let paymentId;
@@ -13,9 +13,9 @@ let paymentId;
 test.describe('QIWI API Tests', () => {
     test('1. Проверка доступности сервиса', async ({ request }) => {
         const response = await request.get(`${config.baseUrl}v1/agents/${config.agentId}/points/${config.pointId}/payments`, {
-          headers: {
-            'Authorization': `Bearer ${config.token}`
-          }
+            headers: {
+                'Authorization': `Bearer ${config.token}`
+            }
         });
 
         await test.step('Статус код 200', async () => {
